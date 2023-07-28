@@ -1,35 +1,41 @@
 const { Router } = require('express');
 const { Op } = require('sequelize');
-const { getProfile } = require('../middleware/getProfile')
+const { getProfile } = require('../middleware/profiles')
 
 const router = Router();
 
 /**
  * @returns contract by id
+ *
+ * SHORTCUT: Here we're assuming the id parameter is always a valid entry,
+ * otherwise we'd have add validation steps
  */
 router.get('/:id', getProfile, async (req, res) => {
   const { Contract } = req.app.get('models')
   const { id: contractId } = req.params
   const { id: profileIdFromHeader } = req.profile
 
-  const contract = await Contract.findOne({
-    where: {
-      [Op.and]: [
-        { id: contractId },
-        {
-          [Op.or]: [
-            { ClientId: profileIdFromHeader },
-            { ContractorId: profileIdFromHeader }
-          ]
-        }
-
-      ]
-    }
-  })
-  if (!contract) return res.status(404).end()
-  res.json(contract)
+  try {
+    const contract = await Contract.findOne({
+      where: {
+        [Op.and]: [
+          { id: contractId },
+          {
+            [Op.or]: [
+              { ClientId: profileIdFromHeader },
+              { ContractorId: profileIdFromHeader }
+            ]
+          }
+        ]
+      }
+    })
+    if (!contract) return res.status(404).json({ message: `No contract found for profileId: ${profileIdFromHeader}` }).end()
+    res.json(contract)
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ message: "Internal server error" }).end()
+  }
 })
-
 
 /**
 * @returns contract all contracts for an user (only non terminated contracts)
@@ -44,23 +50,26 @@ router.get('/', getProfile, async (req, res) => {
   const { id: profileIdFromHeader } = req.profile
   const TERMINATED = 'terminated'
 
-  const contracts = await Contract.findAll({
-    where: {
-      [Op.and]: [
-        { [Op.not]: { status: TERMINATED } },
-        {
-          [Op.or]: [
-            { ClientId: profileIdFromHeader },
-            { ContractorId: profileIdFromHeader }
-          ]
-        }
+  try {
+    const contracts = await Contract.findAll({
+      where: {
+        [Op.and]: [
+          { [Op.not]: { status: TERMINATED } },
+          {
+            [Op.or]: [
+              { ClientId: profileIdFromHeader },
+              { ContractorId: profileIdFromHeader }
+            ]
+          }
 
-      ]
-    }
-  })
-  console.log(contracts)
-  if (!contracts || contracts.length === 0) return res.status(404).end()
-  res.json(contracts)
-
+        ]
+      }
+    })
+    if (!contracts || contracts.length === 0) return res.status(404).json({ message: `No contracts found for profileId: ${profileIdFromHeader}` }).end()
+    res.json(contracts)
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ message: "Internal server error" }).end()
+  }
 })
 module.exports = router;
