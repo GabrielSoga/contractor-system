@@ -32,7 +32,6 @@ const jobErrorMessage = {
 
 /**
  * @returns unpaid jobs for an user (contractor or client) in active contracts.
- * Using sequelize include to join Contract and Job models
  */
 router.get('/unpaid/', getProfile, async (req, res) => {
   const { Contract, Job } = req.app.get('models')
