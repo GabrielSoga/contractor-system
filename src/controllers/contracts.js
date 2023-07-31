@@ -4,6 +4,14 @@ const { getProfile } = require('../middleware/profiles')
 
 const router = Router();
 
+// SHORTCUT: This ideally would be a class to enable testing, but we'll get this shortcut
+const contractErrorMessage = {
+  contractNotFound: (profileIdFromHeader) => ({
+    message: "No active contracts found for this profile id",
+    profileId: profileIdFromHeader
+  })
+}
+
 /**
  * @returns contract by id
  *
@@ -29,7 +37,11 @@ router.get('/:id', getProfile, async (req, res) => {
         ]
       }
     })
-    if (!contract) return res.status(404).json({ message: `No contract found for profileId: ${profileIdFromHeader}` }).end()
+    if (!contract) {
+      return res.status(404)
+      .json(contractErrorMessage.contractNotFound(profileIdFromHeader))
+      .end()
+    }
     res.json(contract)
   } catch (e) {
     console.error(e);
@@ -65,7 +77,11 @@ router.get('/', getProfile, async (req, res) => {
         ]
       }
     })
-    if (!contracts || contracts.length === 0) return res.status(404).json({ message: `No contracts found for profileId: ${profileIdFromHeader}` }).end()
+    if (!contracts || contracts.length === 0) {
+      return res.status(404)
+      .json(contractErrorMessage.contractNotFound(profileIdFromHeader))
+      .end()
+    }
     res.json(contracts)
   } catch (e) {
     console.error(e);

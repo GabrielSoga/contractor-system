@@ -8,6 +8,28 @@ const IN_PROGRESS = 'in_progress'
 
 const router = Router();
 
+// SHORTCUT: This ideally would be a class to enable testing, but we'll get this shortcut
+const jobErrorMessage = {
+  contractNotFound: (profileIdFromHeader) => ({
+    message: "No active contracts found for this profile id",
+    profileId: profileIdFromHeader
+  }),
+  unpaidJobsNotFound: (profileIdFromHeader) => ({
+    message: `No unpaid jobs found for this profile id`,
+    profileId: profileIdFromHeader
+  }),
+  jobNotFound: (jobId, clientIdFromHeader) => ({
+    message: `JobId not found for this client`,
+    jobId: jobId,
+    clientId: clientIdFromHeader
+  }),
+  notEnoughBalance: (balance, price) => ({
+    message: `Not enough balance`,
+    currentBalance: balance,
+    minimumBalance: price
+  })
+}
+
 /**
  * @returns unpaid jobs for an user (contractor or client) in active contracts.
  * Using sequelize include to join Contract and Job models
@@ -42,15 +64,23 @@ router.get('/unpaid/', getProfile, async (req, res) => {
       ]
     });
 
-    if (!contracts || contracts.length === 0) return res.status(404).json({ message: `No active contracts found for profileId: ${profileIdFromHeader}` }).end();
+    if (!contracts || contracts.length === 0) {
+      return res.status(404)
+        .json(jobErrorMessage.contractNotFound(profileIdFromHeader))
+        .end();
+    }
 
     const unpaidJobs = contracts.reduce((jobs, contract) => {
       return jobs.concat(contract.Jobs.map((job) => job.dataValues));
     }, []);
 
-    if (!unpaidJobs || unpaidJobs.length === 0) return res.status(404).json({ message: `No unpaid jobs found for profileId: ${profileIdFromHeader}` }).end()
+    if (!unpaidJobs || unpaidJobs.length === 0) {
+      return res.status(404)
+        .json(jobErrorMessage.unpaidJobsNotFound(profileIdFromHeader))
+        .end()
+    }
 
-    res.json(unpaidJobs)
+    res.status(200).json(unpaidJobs)
   } catch (e) {
     console.error(e);
     res.status(500).json({ message: "Internal server error" }).end()
@@ -58,7 +88,7 @@ router.get('/unpaid/', getProfile, async (req, res) => {
 })
 
 /**
- * @returns  Pay for a job, a client can only pay if his balance >= the amount to pay.
+ * @returns Pay for a job, a client can only pay if his balance >= the amount to pay.
  *  The amount should be moved from the client's balance to the contractor balance.
  *
  * SHORTCUT: Here we're assuming the job_id parameter is always a valid entry,
@@ -97,28 +127,27 @@ router.post('/:job_id/pay', getClientProfile, async (req, res) => {
       ]
     });
 
-    if (!contracts || contracts.length === 0) return res.status(404).json({ message: `No active contracts found for profileId: ${profileIdFromHeader}` }).end();
+    if (!contracts || contracts.length === 0) {
+      return res.status(404)
+        .json(jobErrorMessage.contractNotFound(profileIdFromHeader))
+        .end();
+    }
+
 
     const [targetJob] = contracts[0].Jobs
     const targetClient = contracts[0].Client
     const targetContractor = contracts[0].Contractor
 
     if (!targetJob) {
-      const jobErrorMessage = {
-        message: `JobId not found for this client`,
-        jobId: jobId,
-        clientId: clientIdFromHeader
-      }
-      return res.status(404).json(jobErrorMessage).end();
+      return res.status(404)
+        .json(jobErrorMessage.jobNotFound(jobId, clientIdFromHeader))
+        .end();
     }
 
     if (targetClient.balance < targetJob.price) {
-      const balanceErrorMessage = {
-        message: `Not enough balance`,
-        currentBalance: targetClient.balance,
-        minimumBalance: targetJob.price
-      }
-      return res.status(400).json(balanceErrorMessage).end()
+      return res.status(400)
+        .json(jobErrorMessage.notEnoughBalance(targetClient.balance, targetJob.price))
+        .end()
     }
 
     await sequelize.transaction(async (t) => {
@@ -140,15 +169,14 @@ router.post('/:job_id/pay', getClientProfile, async (req, res) => {
         )
       } catch (e) {
         console.error(e);
-        res.status(500).json({ message: "Internal server error" }).end()
+        res.status(500).json({ message: "Transaction failed" }).end()
       }
     })
-    res.json({ message: "Payment successful" })
+    res.status(200).json({ message: "Payment successful" })
   } catch (e) {
     console.error(e);
     res.status(500).json({ message: "Internal server error" }).end()
   }
-
 })
 
 module.exports = router;
