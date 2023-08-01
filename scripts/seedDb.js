@@ -37,7 +37,7 @@ async function seed() {
     Profile.create({
       id: 4,
       firstName: 'Ash',
-      lastName: 'Kethcum',
+      lastName: 'Ketchum',
       profession: 'Pokemon master',
       balance: 1.3,
       type: 'client'
@@ -72,6 +72,30 @@ async function seed() {
       lastName: 'II Elessar Telcontarvalds',
       profession: 'Fighter',
       balance: 314,
+      type: 'contractor'
+    }),
+    Profile.create({
+      id: 9,
+      firstName: 'Rick',
+      lastName: 'Astley',
+      profession: 'Musician',
+      balance: 3.14,
+      type: 'contractor'
+    }),
+    Profile.create({
+      id: 10,
+      firstName: 'Son',
+      lastName: 'Goku',
+      profession: 'Fighter',
+      balance: 9001,
+      type: 'client'
+    }),
+    Profile.create({
+      id: 11,
+      firstName: 'John',
+      lastName: 'Doe',
+      profession: 'Shapeshifter',
+      balance: 10,
       type: 'contractor'
     }),
     Contract.create({
@@ -136,6 +160,13 @@ async function seed() {
       status: 'in_progress',
       ClientId: 4,
       ContractorId: 8
+    }),
+    Contract.create({
+      id: 10,
+      terms: 'bla bla bla',
+      status: 'in_progress',
+      ClientId: 4,
+      ContractorId: 11
     }),
     Job.create({
       description: 'work',
@@ -225,6 +256,9 @@ async function seed() {
       paymentDate: '2020-08-14T23:11:26.737Z',
       ContractId: 3,
     }),
-
-  ]);
+  ]).then(() => {
+    console.log('Seeding applied')
+  }).catch((e) => console.log('fail', e))
 }
+
+module.exports = seed;

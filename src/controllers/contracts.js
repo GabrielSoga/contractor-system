@@ -39,8 +39,8 @@ router.get('/:id', getProfile, async (req, res) => {
     })
     if (!contract) {
       return res.status(404)
-      .json(contractErrorMessage.contractNotFound(profileIdFromHeader))
-      .end()
+        .json(contractErrorMessage.contractNotFound(profileIdFromHeader))
+        .end()
     }
     res.json(contract)
   } catch (e) {
@@ -79,10 +79,10 @@ router.get('/', getProfile, async (req, res) => {
     })
     if (!contracts || contracts.length === 0) {
       return res.status(404)
-      .json(contractErrorMessage.contractNotFound(profileIdFromHeader))
-      .end()
+        .json(contractErrorMessage.contractNotFound(profileIdFromHeader))
+        .end()
     }
-    res.json(contracts)
+    res.json({ data: contracts })
   } catch (e) {
     console.error(e);
     res.status(500).json({ message: "Internal server error" }).end()

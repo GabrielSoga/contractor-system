@@ -14,6 +14,10 @@ const jobErrorMessage = {
     message: "No active contracts found for this profile id",
     profileId: profileIdFromHeader
   }),
+  jobsContractNotFound: (profileIdFromHeader) => ({
+    message: "No active contracts or unpaid jobs found for this profile id",
+    profileId: profileIdFromHeader
+  }),
   unpaidJobsNotFound: (profileIdFromHeader) => ({
     message: `No unpaid jobs found for this profile id`,
     profileId: profileIdFromHeader
@@ -65,7 +69,7 @@ router.get('/unpaid/', getProfile, async (req, res) => {
 
     if (!contracts || contracts.length === 0) {
       return res.status(404)
-        .json(jobErrorMessage.contractNotFound(profileIdFromHeader))
+        .json(jobErrorMessage.jobsContractNotFound(profileIdFromHeader))
         .end();
     }
 
@@ -79,7 +83,7 @@ router.get('/unpaid/', getProfile, async (req, res) => {
         .end()
     }
 
-    res.status(200).json(unpaidJobs)
+    res.status(200).json({ data: unpaidJobs })
   } catch (e) {
     console.error(e);
     res.status(500).json({ message: "Internal server error" }).end()
@@ -128,7 +132,7 @@ router.post('/:job_id/pay', getClientProfile, async (req, res) => {
 
     if (!contracts || contracts.length === 0) {
       return res.status(404)
-        .json(jobErrorMessage.contractNotFound(profileIdFromHeader))
+        .json(jobErrorMessage.contractNotFound(clientIdFromHeader))
         .end();
     }
 

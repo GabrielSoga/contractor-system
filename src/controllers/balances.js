@@ -79,7 +79,7 @@ router.post('/deposit/:userId', getClientProfile, async (req, res) => {
 
     if (!contracts || contracts.length === 0) {
       return res.status(404)
-        .json(balancesErrorMessage.contractNotFound(profileIdFromHeader))
+        .json(balancesErrorMessage.contractNotFound(clientIdFromHeader))
         .end();
     }
 
