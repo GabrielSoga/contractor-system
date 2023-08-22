@@ -19,7 +19,7 @@ const contractsTests = () => {
       const response = await request(app).get(`/contracts/${contractId}`).set('profile_id', clientProfileId);
 
       expect(response.status).toBe(200);
-      expect(response.body).toEqual(
+      expect(response.body.data).toEqual(
         expect.objectContaining(contractDataStructure)
       )
     });

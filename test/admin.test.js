@@ -9,7 +9,7 @@ const clientDataStructure = {
 }
 
 const adminTests = () => {
-  describe('GET /best-profession', () => {
+  describe('GET /admin/best-profession', () => {
     it('should return the profession that earned the most money for the given time range', async () => {
       const start = "2020-08-14T19:11:26.737"
       const end = "2020-08-16T19:11:26.737"
@@ -38,7 +38,7 @@ const adminTests = () => {
     });
   });
 
-  describe('GET /best-clients', () => {
+  describe('GET /admin/best-clients', () => {
     it('should return the clients who paid the most for jobs in the given time range', async () => {
       const start = "2020-08-14T19:11:26.737"
       const end = "2020-08-16T19:11:26.737"

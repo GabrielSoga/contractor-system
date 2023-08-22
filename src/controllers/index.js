@@ -1,13 +1,11 @@
-const contractsRouter = require('./contracts');
-const jobsRouter = require('./jobs');
-const balancesRouter = require('./balances');
-const adminRouter = require('./admin');
+const contractsRouter = require('./contracts.controller');
+const jobsRouter = require('./jobs.controller');
+const balancesRouter = require('./balances.controller');
+const adminRouter = require('./admin.controller');
 const { Router } = require('express');
 
 const router = Router();
 
-//SHORTCUT: Ideally we should use Service/Repository layers
-//to improve testing, but we'll implement everything in the Controller layer
 router.use('/contracts/', contractsRouter);
 router.use('/jobs/', jobsRouter);
 router.use('/balances/', balancesRouter);
