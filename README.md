@@ -4,6 +4,27 @@
 
 This backend exercise involves building a Node.js/Express.js app that will serve a REST API. We imagine you should spend around 3 hours at implement this feature.
 
+# TESTING AREA
+
+## Automated Testing
+
+Automated tests can be run using:
+```
+npm test
+``` 
+
+It's important to note that this command will run the database seeding as well.
+
+## Manual Testing / Docs (Swagger)
+
+All routes are documented using Swagger JS-Docs. You can run:
+```
+npm start
+```
+and access the Swagger UI through http://localhost:3001/api-docs/, enabling you to test all requests manually.
+
+There are valid testing parameters within all routes descriptions.
+
 ## Data Models
 
 > **All models are defined in src/model.js**
