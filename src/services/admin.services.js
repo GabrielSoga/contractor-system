@@ -87,6 +87,7 @@ class AdminService {
         }
       }
     } catch (e) {
+      console.error(e)
       return {
         status: 500,
         body: this.requestFail()
@@ -109,8 +110,7 @@ class AdminService {
       const clientsPaidMost = await this.model.Profile.findAll({
         attributes: [
           'id',
-          'firstName',
-          'lastName',
+          [this.sequelize.literal("firstName ||' '|| lastName"), 'fullName'],
           [this.sequelize.fn('SUM', this.sequelize.col('Client->Jobs.price')), 'totalPaid'],
         ],
         include: [
@@ -150,6 +150,7 @@ class AdminService {
         body: { data: clientsPaidMostData }
       }
     } catch (e) {
+      console.error(e)
       return {
         status: 500,
         body: this.requestFail()

@@ -13,12 +13,9 @@ const AdminService = require('../services/admin.services');
  *         id:
  *           type: number
  *           description: Client's ID
- *         firstName:
+ *         fullName:
  *           type: string
- *           description: Client's first name
- *         lastName:
- *           type: string
- *           description: Client's last name
+ *           description: Client's full name
  *         totalPaid:
  *           type: number
  *           description: Total amount paid by the client

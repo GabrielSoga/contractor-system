@@ -3,8 +3,7 @@ const app = require('../src/app');
 
 const clientDataStructure = {
   id: expect.any(Number),
-  firstName: expect.any(String),
-  lastName: expect.any(String),
+  fullName: expect.any(String),
   totalPaid: expect.any(Number),
 }
 
